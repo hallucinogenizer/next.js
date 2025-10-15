@@ -17,8 +17,21 @@ const isProxy = page === '/proxy' || page === '/src/proxy'
 const handler = (isProxy ? mod.proxy : mod.middleware) || mod.default
 
 if (typeof handler !== 'function') {
+  const fileName = isProxy ? 'proxy' : 'middleware'
+
   throw new Error(
-    `The ${isProxy ? 'Proxy' : 'Middleware'} "${page}" must export a ${isProxy ? '`proxy`' : '`middleware`'} or a \`default\` function`
+    `The file ${fileName} must export a function, either as a default export or as a named ${fileName} export.
+This function is what Next.js runs for every request handled by this ${fileName === 'proxy' ? 'proxy (previously called middleware)' : 'middleware'}.
+
+Why this happens:
+- The file exists but doesn't export a function.
+- The export is not a function (e.g., an object or constant).
+- There's a syntax error preventing the export from being recognized.
+
+To fix it:
+- Check your "${fileName}" file.
+- Ensure it has either a default or "${fileName}" function export.
+- Restart the dev server if the error persists.`
   )
 }
 
